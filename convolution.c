@@ -118,8 +118,8 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
     
     //perform convolution
 
-    for(int out_depth=0;out_depth<out->d;out_depth++)
-        for(int i=0;i<in->d;i++)
+    for(int i=0;i<in->d;i++)
+        for(int out_depth=0;out_depth<out->d;out_depth++)
             for(int out_y=0;out_y<out->h;out_y++)
                 for(int out_x=0;out_x<out->w;out_x++)
                     for(int ky=0;ky<Ky;ky++)
