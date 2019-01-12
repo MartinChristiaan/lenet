@@ -111,26 +111,23 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
     //load weights
     BLOB* w = load_weights(in, p);
     
-    printf("out w : %i  h : %i d : %i  ",out->w,out->h,out->d);
-    printf("in w : %i  h : %i d : %i  ",in->w,in->h,in->d);
-    printf("group : %i  Ky : %i Kx : %i  ",p->group,Ky,Kx);
+    // printf("out w : %i  h : %i d : %i  ",out->w,out->h,out->d);
+    // printf("in w : %i  h : %i d : %i  ",in->w,in->h,in->d);
+    // printf("group : %i  Ky : %i Kx : %i  ",p->group,Ky,Kx);
+    //printf("Sy : %i Sx : %i  ",p->Sx,p->Sy);
     
-    
-
-
-
     //perform convolution
-    for(int group_id=0;group_id<p->group;group_id++)
-        for(int out_depth=group_id*(out->d/p->group);out_depth<(group_id+1)*(out->d/p->group);out_depth++)
-            for(int i=group_id*(in->d/p->group);i<(group_id+1)*(in->d/p->group);i++)
-                for(int out_y=0;out_y<out->h;out_y++)
-                    for(int out_x=0;out_x<out->w;out_x++)
-                        for(int ky=0;ky<Ky;ky++)
-                            for(int kx=0;kx<Kx;kx++)
-                                //note: absolute starting i is subtracted for the weights, see load_weights function for more info
-                                blob_data(out,out_depth,out_y,out_x)+=
-                                    blob_data(in, i, out_y*p->Sy+ky, out_x*p->Sx+kx) * 
-                                    blob_data(w, out_depth, i-(group_id*(in->d/p->group)), ky*Kx + kx);
+
+    for(int out_depth=0;out_depth<out->d;out_depth++)
+        for(int i=0;i<in->d;i++)
+            for(int out_y=0;out_y<out->h;out_y++)
+                for(int out_x=0;out_x<out->w;out_x++)
+                    for(int ky=0;ky<Ky;ky++)
+                        for(int kx=0;kx<Kx;kx++)
+                            //note: absolute starting i is subtracted for the weights, see load_weights function for more info
+                            blob_data(out,out_depth,out_y,out_x)+=
+                                blob_data(in, i, out_y+ky, out_x+kx) * 
+                                blob_data(w, out_depth, i, ky*Kx + kx);
 
     //free weights
     blob_free(w);
