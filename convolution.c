@@ -134,24 +134,20 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
                 for(int out_depth=0;out_depth<500;out_depth++)
                     {
                     for(int kx=0;kx<4;kx++)
-                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                         out->data[out_depth] +=
                             blob_data(in, i, 0, kx) * 
                             blob_data(w, out_depth, i, kx);
 
                     
                     for(int kx=0;kx<4;kx++)
-                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                         out->data[out_depth] +=
                             blob_data(in, i, 1, kx) * 
                             blob_data(w, out_depth, i, 4 + kx);
                     for(int kx=0;kx<4;kx++)
-                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                         out->data[out_depth] +=
                             blob_data(in, i, 2, kx) * 
                             blob_data(w, out_depth, i, 8 + kx);
                     for(int kx=0;kx<4;kx++)
-                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                         out->data[out_depth] +=
                             blob_data(in, i, 3, kx) * 
                             blob_data(w, out_depth, i, 12 + kx);
@@ -161,7 +157,8 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
     }
     else
     {
-        for(int i=0;i<in->d;i++)
+        if(in->d == 1)
+        {
             for(int out_depth=0;out_depth<out->d;out_depth++)
                 for(int out_y=0;out_y<out->h;out_y++)
                     for(int out_x=0;out_x<out->w;out_x++)
@@ -169,8 +166,22 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
                             for(int kx=0;kx<5;kx++)
                                 //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                                 blob_data(out,out_depth,out_y,out_x)+=
-                                    blob_data(in, i, out_y+ky, out_x+kx) * 
-                                    blob_data(w, out_depth, i, ky*Kx + kx);
+                                    in->data[(out_y + ky)*in->w + out_x+kx] *
+                                    w->data[out_depth * w->w*w->w + ky*Kx + kx]; 
+        }
+        else
+        {
+            for(int i=0;i<in->d;i++)
+                for(int out_depth=0;out_depth<out->d;out_depth++)
+                    for(int out_y=0;out_y<out->h;out_y++)
+                        for(int out_x=0;out_x<out->w;out_x++)
+                            for(int ky=0;ky<5;ky++)
+                                for(int kx=0;kx<5;kx++)
+                                    //note: absolute starting i is subtracted for the weights, see load_weights function for more info
+                                    blob_data(out,out_depth,out_y,out_x)+=
+                                        blob_data(in, i, out_y+ky, out_x+kx) * 
+                                        blob_data(w, out_depth, i, ky*Kx + kx);
+        }
     }
 
 
