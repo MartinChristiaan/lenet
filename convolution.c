@@ -111,22 +111,53 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
     //load weights
     BLOB* w = load_weights(in, p);
     
-    printf("out w : %i  h : %i d : %i  \n",out->w,out->h,out->d);
-    printf("in w : %i  h : %i d : %i  \n",in->w,in->h,in->d);
-    printf("Ky : %i Kx : %i  \n ",Ky,Kx);
+    // printf("out w : %i  h : %i d : %i  \n",out->w,out->h,out->d);
+    // printf("in w : %i  h : %i d : %i  \n",in->w,in->h,in->d);
+    // printf("Ky : %i Kx : %i  \n ",Ky,Kx);
 
     
     //perform convolution
     if(out->w == 1)
     {
-        for(int i=0;i<in->d;i++)
-            for(int out_depth=0;out_depth<out->d;out_depth++)
-                for(int ky=0;ky<Ky;ky++)
-                    for(int kx=0;kx<Kx;kx++)
+        if(in->w==1)
+        {
+            for(int i=0;i<500;i++)
+                for(int out_depth=0;out_depth<10;out_depth++)
+                    out->data[out_depth] +=
+                        in->data[i] * 
+                        blob_data(w, out_depth, i, 0);
+
+        }
+        else
+        {
+            for(int i=0;i<50;i++)
+                for(int out_depth=0;out_depth<500;out_depth++)
+                    {
+                    for(int kx=0;kx<4;kx++)
                         //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                         out->data[out_depth] +=
-                            blob_data(in, i, ky, kx) * 
-                            blob_data(w, out_depth, i, ky*Kx + kx);
+                            blob_data(in, i, 0, kx) * 
+                            blob_data(w, out_depth, i, kx);
+
+                    
+                    for(int kx=0;kx<4;kx++)
+                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
+                        out->data[out_depth] +=
+                            blob_data(in, i, 1, kx) * 
+                            blob_data(w, out_depth, i, 4 + kx);
+                    for(int kx=0;kx<4;kx++)
+                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
+                        out->data[out_depth] +=
+                            blob_data(in, i, 2, kx) * 
+                            blob_data(w, out_depth, i, 8 + kx);
+                    for(int kx=0;kx<4;kx++)
+                        //note: absolute starting i is subtracted for the weights, see load_weights function for more info
+                        out->data[out_depth] +=
+                            blob_data(in, i, 3, kx) * 
+                            blob_data(w, out_depth, i, 12 + kx);
+                    
+                    }
+        }
     }
     else
     {
@@ -134,8 +165,8 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
             for(int out_depth=0;out_depth<out->d;out_depth++)
                 for(int out_y=0;out_y<out->h;out_y++)
                     for(int out_x=0;out_x<out->w;out_x++)
-                        for(int ky=0;ky<Ky;ky++)
-                            for(int kx=0;kx<Kx;kx++)
+                        for(int ky=0;ky<5;ky++)
+                            for(int kx=0;kx<5;kx++)
                                 //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                                 blob_data(out,out_depth,out_y,out_x)+=
                                     blob_data(in, i, out_y+ky, out_x+kx) * 
