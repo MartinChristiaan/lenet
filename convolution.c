@@ -167,7 +167,7 @@ BLOB* convolution(BLOB* input, conv_param_t* p){
                                 //note: absolute starting i is subtracted for the weights, see load_weights function for more info
                                 blob_data(out,out_depth,out_y,out_x)+=
                                     in->data[(out_y + ky)*in->w + out_x+kx] *
-                                    w->data[out_depth * w->w*w->w + ky*Kx + kx]; 
+                                    w->data[out_depth * w->w*w->h + ky*Kx + kx]; 
         }
         else
         {
